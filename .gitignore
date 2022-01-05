@@ -1,6 +1,8 @@
 # my data
 tools/
 data/
+.DS_Store
+results/
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template

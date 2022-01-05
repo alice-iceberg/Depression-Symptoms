@@ -3,7 +3,16 @@ import pandas as pd
 import tools
 
 
+def preprocess_original_df(filename):
+    return binarize_symptoms_gt(process_missing_data(filter_dataframe(filename)))
+
+
 def filter_dataframe(filename):
+    """
+    Filters out participants and EMAs not suitable for further analysis
+    :param filename: filename of original csv file with extracted features
+    :return: filtered dataframe
+    """
     df = pd.read_csv(filename)
     print(f'Original Dataframe: {df.shape}')
 
@@ -43,4 +52,17 @@ def process_missing_data(df):
     print(f'Dataframe after missing data preprocessing: {df.shape}')
     df.to_csv(tools.PREPROCESSED_FEATURES_PATH, index=False)
 
+    return df
+
+
+def get_feature_variation_per_participant(df, feature):
+    df_std = df.groupby(['pid'])[feature].std()
+    df_std.sort_values(inplace=True)
+    df_std.to_csv(f'{tools.TOOLS_PATH}/{feature}_stdev_per_pid.csv')
+
+
+def binarize_symptoms_gt(df):
+    for col in tools.SYMPTOM_ORIGINAL_COLUMN_LIST:
+        df[f'{col}_bin'] = df.apply(lambda x: 0 if x[col] == 1 else 1, axis=1)
+    df.to_csv(tools.PREPROCESSED_FEATURES_PATH, index=False)
     return df

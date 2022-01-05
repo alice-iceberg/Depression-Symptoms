@@ -1,5 +1,10 @@
 import os
 
+from sklearn.metrics import confusion_matrix
+
+import tools
+
+RANDOM_SEED = 44
 FEATURES_PATH = '/Users/aliceberg/Documents/Paper2022/data/FS_all_sensors_campaign_4_5-WIN_4.csv'
 PREPROCESSED_FEATURES_PATH = 'data/FS_all_sensors_campaign_4_5-WIN_4_preprocessed.csv'
 TOOLS_PATH = 'tools'
@@ -84,7 +89,33 @@ IMPUTE_ZERO_FEATURES_LIST = ["activity#4HR#RUNNING#dur",
                              "notif#4HR#DECISION_TIME_freq",
                              "typing#4HR#freq",
                              ]
-DROP_PARTICIPANT_LIST = [4082, 4084, 4096]
+
+SYMPTOM_ORIGINAL_COLUMN_LIST = ["lack_of_interest",
+                                "depressed_feeling",
+                                "sleep_trouble",
+                                "fatigue",
+                                "poor_appetite",
+                                "negative_self_image",
+                                "difficulty_focusing",
+                                "bad_physchomotor_activity",
+                                "suicide_thoughts"]
+
+SYMPTOM_BIN_COLUMN_LIST = ["lack_of_interest_bin",
+                           "depressed_feeling_bin",
+                           "sleep_trouble_bin",
+                           "fatigue_bin",
+                           "poor_appetite_bin",
+                           "negative_self_image_bin",
+                           "difficulty_focusing_bin",
+                           "bad_physchomotor_activity_bin",
+                           "suicide_thoughts_bin"
+                           ]
+
+DROP_PARTICIPANT_LIST = [4082, 4084, 4096,  # Android version problem
+                         5072, 50196, 50189, 50417, 50370, 50215,  # 0 variation in total phq score
+                         50179, 50230, 50538, 50628, 50630,  # have 1 EMA only
+                         50702, 50710, 50769, 50514, 50286, 50477, 50771, 50765, 50184, 50365, 50389, 50759, 50559,
+                         50513, 50343, 50692, 50742, 50741, 50738, 50691, 50700, 50577, 50733]  # have less than 10 EMAs
 
 
 def create_dir_if_not_exists(directory):
@@ -96,3 +127,14 @@ def fillna_mean_bygroup(df, cols, group):
     cols = [col for col in cols if col.__contains__('#')]
     df[cols] = df.groupby(group)[cols].transform(lambda x: x.fillna(x.mean()))
     return df
+
+
+def specificity_score(y_true, y_pred):
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    return tn / (tn + fp)
+
+
+def get_samples_per_group(df, group):
+    df_out = df.groupby(group).size()
+    df_out.sort_values(inplace=True)
+    df_out.to_csv(f'{tools.TOOLS_PATH}/samples_per_pid.csv')
