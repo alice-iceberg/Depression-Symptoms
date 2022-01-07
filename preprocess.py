@@ -66,3 +66,15 @@ def binarize_symptoms_gt(df):
         df[f'{col}_bin'] = df.apply(lambda x: 0 if x[col] == 1 else 1, axis=1)
     df.to_csv(tools.PREPROCESSED_FEATURES_PATH, index=False)
     return df
+
+
+def normalize_dataframe(df, columns):
+    for column in columns:
+        df[column] = df.groupby('pid')[column].apply(lambda x: (x-min(x))/(max(x)-min(x)))
+    return df
+
+def binnarize_dataframe(df, columns):
+    bins = [-0.0001, 0.5, 0.75, 1.0001]
+    for column in columns:
+        df[column] = df.groupby('pid')[column].apply(lambda x: pd.cut(x, bins=bins, labels=[1,2,3], include_lowest=True)).astype(str)
+    return df

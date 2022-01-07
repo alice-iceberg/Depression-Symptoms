@@ -6,7 +6,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score, precision_score, recall_score
 from sklearn.model_selection import GroupKFold
+import matplotlib.pyplot as plt
 
+import preprocess
 import tools
 from tools import specificity_score
 
@@ -29,7 +31,7 @@ def LOSOCatBoost(X, y, feature_names, pids, gt):
     splitter = GroupKFold(n_splits=len(np.unique(pids)))
     results = []
     for i, (train_index, test_index) in enumerate(splitter.split(X, y, groups=pids)):
-        results.append(run_trial(X, y, train_index, test_index, feature_names))
+        results.append(run_trial(X, y, train_index, test_index, feature_names, gt))
     results = pd.DataFrame(results)
     results.insert(0, 'CV_TYPE', 'LOSO', allow_duplicates=True)
     results.insert(0, 'GT', gt, allow_duplicates=True)
@@ -37,7 +39,7 @@ def LOSOCatBoost(X, y, feature_names, pids, gt):
     return results
 
 
-def run_trial(X, y, train_index, test_index, feature_names):
+def run_trial(X, y, train_index, test_index, feature_names, gt):
     pids = X['pid']
     pid = X['pid'].iloc[test_index].unique()[0]
     X = X[feature_names]
@@ -71,23 +73,41 @@ def run_trial(X, y, train_index, test_index, feature_names):
     res = metrics
     res.update({'pid': pid})
 
+    feat_importances = pd.Series(cb_clf.feature_importances_, index=X.columns)
+    save_feature_importance(pid, feat_importances, gt)
+
     return res
 
 
 def group_inner_split(X_train, y_train, pids):
-    inner_splitter = GroupKFold(n_splits=5)
+    inner_splitter = GroupKFold(n_splits=2)
     for dev_index, val_index in inner_splitter.split(X_train, y_train, groups=pids):
         return dev_index, val_index
 
 
 def run_classification(df, gt):
     M_features = df.columns.str.contains('#')
-    feature_names = df.columns[M_features].tolist()
+    feature_names = list(df.columns[M_features])
     feature_names.append('pid')
-
     X = df[feature_names]
+
+    # X = preprocess.normalize_dataframe(X, feature_names)
+    # X = preprocess.binnarize_dataframe(X, feature_names)
     y = df[gt]
     pids = df['pid']
+    feature_names.remove('pid')
 
     return LOSOCatBoost(X, y, feature_names, pids, gt)
 
+
+def save_feature_importance(pid, feature_importances, gt):
+    # fig = plt.figure()
+    # feat_importances = pd.Series(cb_clf.feature_importances_, index=X.columns)
+    # feat_importances.nlargest(20).plot(kind='barh')
+    # fig.savefig(f'figures/{gt}_{pid}_imp.png', dpi=300, bbox_inches="tight")
+    # plt.close(fig)
+
+    feature_importances.sort_values(inplace=True, ascending=False)
+    feature_importances = feature_importances.head(20)
+    feature_importances['pid'] = pid
+    feature_importances.to_csv(f'importance/{gt}_{pid}.csv')

@@ -8,6 +8,11 @@ RANDOM_SEED = 44
 FEATURES_PATH = '/Users/aliceberg/Documents/Paper2022/data/FS_all_sensors_campaign_4_5-WIN_4.csv'
 PREPROCESSED_FEATURES_PATH = 'data/FS_all_sensors_campaign_4_5-WIN_4_preprocessed.csv'
 TOOLS_PATH = 'tools'
+RESULTS_PATH = 'results'
+SELECTED_PID_BY_PHQ_SAMPLES = [50114, 50125, 50288, 50396, 5049, 40105, 50175, 40137, 40110, 40126, 5079, 50379, 50139,
+                               40103, 40125, 5097, 50360, 40119, 40116, 40108, 50224, 5060, 50455, 40150, 5057, 40122,
+                               50119, 50358, 40115, 40178, 50454, 50229, 40134, 50255, 40179, 40170, 40169, 5096, 40132,
+                               5014, 50106, 40114, 5021, 40109, 5073, 5061, 40143, 50134, 50400, 50163]
 DROP_FEATURES_LIST = ["mediaStorage#4HR#MUSIC_VAR",
                       "mediaStorage#4HR#VIDEO_VAR",
                       "mediaStorage#4HR#IMAGE_VAR",
@@ -107,8 +112,6 @@ SYMPTOM_BIN_COLUMN_LIST = ["lack_of_interest_bin",
                            "poor_appetite_bin",
                            "negative_self_image_bin",
                            "difficulty_focusing_bin",
-                           "bad_physchomotor_activity_bin",
-                           "suicide_thoughts_bin"
                            ]
 
 DROP_PARTICIPANT_LIST = [4082, 4084, 4096,  # Android version problem
@@ -138,3 +141,9 @@ def get_samples_per_group(df, group):
     df_out = df.groupby(group).size()
     df_out.sort_values(inplace=True)
     df_out.to_csv(f'{tools.TOOLS_PATH}/samples_per_pid.csv')
+
+
+def remove_ds_store(filenames):
+    if '.DS_Store' in filenames:
+        filenames.remove('.DS_Store')
+    return filenames
