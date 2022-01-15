@@ -103,12 +103,6 @@ def run_classification(args):
 
 
 def save_feature_importance(pid, feature_importances, gt):
-    # fig = plt.figure()
-    # feat_importances = pd.Series(cb_clf.feature_importances_, index=X.columns)
-    # feat_importances.nlargest(20).plot(kind='barh')
-    # fig.savefig(f'figures/{gt}_{pid}_imp.png', dpi=300, bbox_inches="tight")
-    # plt.close(fig)
-
     feature_importances.sort_values(inplace=True, ascending=False)
     feature_importances = feature_importances.head(20)
     feature_importances['pid'] = pid
