@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
 from tqdm import tqdm
-import preprocess
 
+import preprocess
 import tools
 
 RANDOM_SEED = 44
@@ -127,7 +127,6 @@ SYMPTOM_BIN_COLUMN_LIST = ["lack_of_interest_bin",
                            "difficulty_focusing_bin",
                            "bad_physchomotor_activity_bin",
                            ]
-
 
 DROP_PARTICIPANT_LIST = [4082, 4084, 4096]
 
@@ -309,3 +308,7 @@ def create_ema_stats_file():
     df_out['samples'] = samples
     df_out.sort_values(by=['var_sum', 'samples'], inplace=True, ascending=False)
     df_out.to_csv("tools/cmp45_Jan/combined_stdev_nondep_5.csv", index=False)
+
+
+def subtract_lists(l1, l2):
+    return [x for x in l1 if x not in l2]
