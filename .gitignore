@@ -3,6 +3,11 @@ tools/
 data/
 .DS_Store
 results/
+symptoms/
+stats/
+catboost_info/
+figures/
+importance/
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template

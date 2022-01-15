@@ -6,25 +6,22 @@ import tools
 
 
 def combine_results(directory):
+    frames = []
     filenames = os.listdir(directory)
     filenames = tools.remove_ds_store(filenames)
-    frames = []
 
     for filename in filenames:
-        df = pd.read_csv(f'{tools.RESULTS_PATH}/selected/{filename}')
         suffix = f'_{filename.split("_")[0]}'
+        df = pd.read_csv(f'{directory}/{filename}')
         pids = df['pid']
         df.drop(columns=['CV_TYPE', 'GT', 'pid'], axis=1, inplace=True)
         df = df.add_suffix(suffix)
         df['pid'] = pids
-
         frames.append(df)
+
     df_out = pd.concat(frames, axis=1)
-    M_unnamed_col = df_out.columns.str.contains('Unnamed')
-    cols = df_out.columns[~M_unnamed_col].tolist()
-    df_out = df_out[cols]
     df_out = df_out.loc[:, ~df_out.columns.duplicated()]
-    df_out.to_csv(f'{tools.RESULTS_PATH}/selected/combined_results_sel.csv', index=False)
+    df_out.to_csv(f'{directory}/combined_results.csv', index=False)
 
 
 def combine_results_with_stats(filename):

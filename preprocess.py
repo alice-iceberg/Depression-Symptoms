@@ -58,7 +58,8 @@ def process_missing_data(df):
 def get_feature_variation_per_participant(df, feature):
     df_std = df.groupby(['pid'])[feature].std()
     df_std.sort_values(inplace=True)
-    df_std.to_csv(f'{tools.TOOLS_PATH}/{feature}_stdev_per_pid.csv')
+    # df_std.to_csv(f'{tools.TOOLS_PATH}/{feature}_stdev_per_pid.csv')
+    return df_std
 
 
 def binarize_symptoms_gt(df):

@@ -80,12 +80,14 @@ def run_trial(X, y, train_index, test_index, feature_names, gt):
 
 
 def group_inner_split(X_train, y_train, pids):
-    inner_splitter = GroupKFold(n_splits=2)
+    inner_splitter = GroupKFold(n_splits=5)
     for dev_index, val_index in inner_splitter.split(X_train, y_train, groups=pids):
         return dev_index, val_index
 
 
-def run_classification(df, gt):
+def run_classification(args):
+    df = args[0]
+    gt = args[1]
     M_features = df.columns.str.contains('#')
     feature_names = list(df.columns[M_features])
     feature_names.append('pid')
@@ -97,7 +99,7 @@ def run_classification(df, gt):
     pids = df['pid']
     feature_names.remove('pid')
 
-    return LOSOCatBoost(X, y, feature_names, pids, gt)
+    return [LOSOCatBoost(X, y, feature_names, pids, gt), gt]
 
 
 def save_feature_importance(pid, feature_importances, gt):
