@@ -86,4 +86,4 @@ def main():
 
 
 if __name__ == '__main__':
-    correlations.phq_score_vs_features_corr(tools.PREPROCESSED_FEATURES_PATH, 'non-depressed')
+    correlations.symptoms_vs_features_corr(tools.PREPROCESSED_FEATURES_PATH, 'all')
