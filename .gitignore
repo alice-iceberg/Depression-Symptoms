@@ -8,7 +8,8 @@ stats/
 catboost_info/
 figures/
 importance/
-
+correlation/
+*.csv
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files

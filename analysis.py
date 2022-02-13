@@ -13,10 +13,14 @@ def combine_results(directory):
     for filename in filenames:
         suffix = f'_{filename.split("_")[0]}'
         df = pd.read_csv(f'{directory}/{filename}')
-        pids = df['pid']
-        df.drop(columns=['CV_TYPE', 'GT', 'pid'], axis=1, inplace=True)
-        df = df.add_suffix(suffix)
-        df['pid'] = pids
+        if directory.__contains__('stratified'):
+            df.drop(columns=['CV_TYPE', 'GT'], axis=1, inplace=True)
+            df = df.add_suffix(suffix)
+        else:
+            pids = df['pid']
+            df.drop(columns=['CV_TYPE', 'GT', 'pid'], axis=1, inplace=True)
+            df = df.add_suffix(suffix)
+            df['pid'] = pids
         frames.append(df)
 
     df_out = pd.concat(frames, axis=1)
